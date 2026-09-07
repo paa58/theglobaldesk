@@ -1,0 +1,21 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { COUNTRIES } from '../../countries.js';
+import { getCollection } from 'astro:content';
+export async function getStaticPaths() {
+  const posts = await getCollection('posts');
+  return posts.map(post => ({ params: { slug: post.slug }, props: { post } }));
+}
+const { post } = Astro.props;
+const { Content } = await post.render();
+const labelOf = (slug) => COUNTRIES.find(c => c.slug === slug)?.label || slug;
+---
+<Layout title={post.data.title}>
+  <article>
+    <span class="tag">{labelOf(post.data.country)}</span>
+    <h1>{post.data.title}</h1>
+    <p class="meta">{post.data.pubDate.toLocaleDateString('pt-BR')} {post.data.sourceAuthor && `· via @${post.data.sourceAuthor}`}</p>
+    <Content />
+    {post.data.sourceUrl && <p><a href={post.data.sourceUrl} target="_blank">Ver post original</a></p>}
+  </article>
+</Layout>

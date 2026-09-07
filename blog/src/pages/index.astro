@@ -1,0 +1,20 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { COUNTRIES } from '../countries.js';
+import { getCollection } from 'astro:content';
+const base = import.meta.env.BASE_URL;
+const posts = (await getCollection('posts')).sort((a,b) => b.data.pubDate - a.data.pubDate);
+const labelOf = (slug) => COUNTRIES.find(c => c.slug === slug)?.label || slug;
+---
+<Layout title="Início">
+  <ul class="post-list">
+    {posts.map(post => (
+      <li>
+        <span class="tag">{labelOf(post.data.country)}</span>
+        <h2><a href={`${base}posts/${post.slug}/`}>{post.data.title}</a></h2>
+        <p class="meta">{post.data.pubDate.toLocaleDateString('pt-BR')} {post.data.sourceAuthor && `· via @${post.data.sourceAuthor}`}</p>
+        <p>{post.data.description}</p>
+      </li>
+    ))}
+  </ul>
+</Layout>
